@@ -298,15 +298,16 @@ class DoctorTiming extends Component {
 
         return (
             <Fragment>
-                <section className='d-flex justify-content-center' style={{    padding: "10px 80px",marginBottom: "15px"}}>
+                <section className='d-flex justify-content-center' style={{padding: "10px 80px",marginBottom: "15px"}}>
                     <div className='formMainDiv'>
                         <h5>Edit Work Timings</h5>
                         <hr />
                         {/* monday */}
                         <div className='d-flex flex-column' style={{padding: "10px 60px"}}>
-                            <div>
+                            <div style={{padding: "10px 0px"}}>
                                 <label htmlFor=''>Monday</label>
                                 <button
+                                    style={{marginLeft:"15px"}}
                                     className="btn btn-success"
                                     onClick={() => this._handleAdd("monday")}>
                                     Add
@@ -334,9 +335,10 @@ class DoctorTiming extends Component {
                         </div>
                         {/* tuesday */}
                         <div className='d-flex flex-column' style={{padding: "10px 60px"}}>
-                            <div>
+                            <div style={{padding: "10px 0px"}}>
                                 <label htmlFor=''>Tuesday</label>
                                 <button
+                                    style={{marginLeft:"15px"}}
                                     className="btn btn-success"
                                     onClick={() => this._handleAdd("tuesday")}>
                                     Add
@@ -364,9 +366,10 @@ class DoctorTiming extends Component {
                         </div>
                         {/* wednesday */}
                         <div className='d-flex flex-column' style={{padding: "10px 60px"}}>
-                            <div>
+                            <div style={{padding: "10px 0px"}}>
                                 <label htmlFor=''> Wednesday</label>
                                 <button
+                                    style={{marginLeft:"15px"}}
                                     className="btn btn-success"
                                     onClick={() => this._handleAdd(" wednesday")}>
                                     Add
@@ -394,9 +397,10 @@ class DoctorTiming extends Component {
                         </div>
                         {/* thursday */}
                         <div className='d-flex flex-column' style={{padding: "10px 60px"}}>
-                            <div>
+                            <div style={{padding: "10px 0px"}}>
                                 <label htmlFor=''>Thursday</label>
                                 <button
+                                    style={{marginLeft:"15px"}}
                                     className="btn btn-success"
                                     onClick={() => this._handleAdd("thursday")}>
                                     Add
@@ -424,9 +428,11 @@ class DoctorTiming extends Component {
                         </div>
                         {/* friday */}
                         <div className='d-flex flex-column' style={{padding: "10px 60px"}}>
-                            <div>
+                            <div style={{padding: "10px 0px"}}>
                                 <label htmlFor=''>Friday</label>
                                 <button
+                                    className="btn btn-success"
+                                    style={{marginLeft:"15px"}}
                                     onClick={() => this._handleAdd("monday")}>
                                     Add
                                 </button>
@@ -453,9 +459,11 @@ class DoctorTiming extends Component {
                         </div>
                         {/* saturday */}
                         <div className='d-flex flex-column' style={{padding: "10px 60px"}}>
-                            <div>
+                            <div style={{padding: "10px 0px"}}>
                                 <label htmlFor=''>Saturday</label>
                                 <button
+                                    className="btn btn-success"
+                                    style={{marginLeft:"15px"}}
                                     onClick={() => this._handleAdd("saturday")}>
                                     Add
                                 </button>
@@ -481,9 +489,11 @@ class DoctorTiming extends Component {
                         </div>
                         {/* sunday */}
                         <div className='d-flex flex-column' style={{padding: "10px 60px"}}>
-                            <div>
+                            <div style={{padding: "10px 0px"}}>
                                 <label htmlFor=''>Sunday</label>
                                 <button
+                                    className="btn btn-success"
+                                    style={{marginLeft:"15px"}}
                                     onClick={() => this._handleAdd("monday")}>
                                     Add
                                 </button>
@@ -509,10 +519,10 @@ class DoctorTiming extends Component {
                             )}
                         </div>
                         <hr />
-                        <div>
+                        <div className="d-flex justify-content-end">
                             <button
                                 onClick={this._handleSubmitData}
-                                className='btn btn-dark'>
+                                className='btn btn-primary ' style={{width:"20%"}}>
                                 Save
                             </button>
                         </div>
