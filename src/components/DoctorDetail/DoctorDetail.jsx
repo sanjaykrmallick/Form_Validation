@@ -7,11 +7,6 @@ class DoctorDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            user: {
-                name: "",
-                speciality: "",
-               
-            },
             isDirty: {
                 name:"",
                 speciality: "",
@@ -24,8 +19,9 @@ class DoctorDetail extends Component {
                 phone: "",
                 gender: "",
                 regNo: "",
+                graduation:"",
                 specialize: "",
-                superSpecilize: "",
+                superSpecialize: "",
             },
             userData:{
                 name:"",
@@ -39,32 +35,26 @@ class DoctorDetail extends Component {
                 phone: "",
                 gender: "",
                 regNo: "",
+                graduation:"",
                 specialize: "",
-                superSpecilize: "",
+                superSpecialize: "",
             },
             errors: {},
             hasCharError: false,
             attachToken: true,
             specialities:[],
+            lang: [
+                'Hindi','English','Punjabi','Bengali','Marathi','Telugu',
+                'Tamil','Gujrati','Assamese','Kannada','Oriya','Malayalam'
+            ],
+            isLoading:false,
         };
-        this._handleOnChange = this._handleOnChange.bind(this)
-        this._handleOnSubmit = this._handleOnSubmit.bind(this)
-        
-        // this._handleOnBlur = this._handleOnBlur.bind(this);
-        // this._handleOnFocus = this._handleOnFocus.bind(this);
-        // this._checklang = this._checklang.bind(this)
     }
 
     componentDidMount() {
         this.makeGetRequestDocDetail(url, this.state.attachToken);
         this.makeGetRequestDocSpeciality(url1, this.state.attachToken);
     }
-
-    // if(e.target.value.match(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/)){
-    //     this.setState({hasError:false});
-    // }else{
-    //     this.setState({hasError:true});
-    // }
 
     makeGetRequestDocDetail(url, attachToken) {
         let headers = {
@@ -107,15 +97,18 @@ class DoctorDetail extends Component {
                                 phone: docDet.phone,
                                 gender: docDet.gender,
                                 regNo: docDet.registrationNumber,
+                                graduation:docDet.qualification,
                                 specialize: docDet.specialty,
-                                superSpecilize: docDet.superSpeciality,
+                                superSpecialize: docDet.superSpeciality,
                             }
                             });
                             resolve(jsonResponse);
+                            
                         } else {
                             console.log(jsonResponse);
                             reject(jsonResponse);
                         }
+                        this.setState({isLoading:true,})
                     })
                     .catch((e) => {
                         console.log("XHR GET Error: ", e);
@@ -155,9 +148,6 @@ class DoctorDetail extends Component {
                     .then((jsonResponse) => {
                         if (jsonResponse.error === false) {
                             console.log("Specialties Data: ",jsonResponse);
-                            // this.setState({
-                            //     specialities: jsonResponse.specialties
-                            // })
                             resolve(jsonResponse);
                            let speci = jsonResponse.specialties.map((e)=>{
                                 console.log(e.name)
@@ -182,48 +172,20 @@ class DoctorDetail extends Component {
         });
     }
 
-    // _checklang=(lan)=>{
-    //     let datlang = new Array(this.state.userData.lang)
-    //         const res =datlang[0].includes(lan)
-    //         if(res===false){
-    //             return false
-    //         }else{
-    //             return true
-    //         }
-    //     }
-
-    //     _handleOnBlur = (e) => {
-    //         e.preventDefault();
-    //         if (e.target.value.match(/^[a-zA-Z]*$/)) {
-    //             this.setState({ hasCharError: false });
-    //         }
-    //         if(e.target.value === undefined){
-    //             this.setState({hasCharError:true});
-    //         }
-    //         if(e.target.value === ""){
-    //             this.setState({hasCharError:true});
-    //         }
-    //     };
-    //     _handleOnFocus =(e) => {
-    //         e.preventDefault();
-    //         this.setState({hasCharError:false})
-    //     }
-
-    //     _handleOnChangesSpeciality=(e)=>{
-    //         e.preventDefault();
-    //         const selected = e.target.value 
-    //         console.log("selected speciality :",selected)
-    //         this.setState({
-    //             user:{
-    //                 speciality: selected,
-    //             }
-    //         })
-    //     }
-
         _handleOnChange = (field, value)=> {
             console.log(field, value);
+            // debugger
             const { userData, isDirty } = this.state;
-            if(field === 'languages') {
+            if(!value && typeof value === 'number') {
+                userData[field] = '';
+                isDirty[field] = true;
+                this.setState({ userData, isDirty }, () => {
+                    this._validateForm();
+                    console.log(this.state)
+                });
+                return;
+            }
+            else if(field === 'lang') {
                 if(value.checked) {
                     userData[field].push(value.value)
                 } else {
@@ -237,17 +199,6 @@ class DoctorDetail extends Component {
                 this._validateForm();
                 console.log(this.state)
             });
-
-            if(!value && typeof value === 'number') {
-                userData[field] = '';
-                isDirty[field] = true;
-                this.setState({ userData, isDirty }, () => {
-                    this._validateForm();
-                    console.log(this.state)
-                });
-                return;
-            }
-
         }
 
         _handleOnSubmit = (e) => {
@@ -265,8 +216,8 @@ class DoctorDetail extends Component {
                 gender: true,
                 regNo: true,
                 graduation: true,
-                specialization: true,
-                superSpecialization: true,
+                specialize: true,
+                superSpecialize:  true,
             };
             this.setState({ isDirty }, () => {
               let errors = this._validateForm();
@@ -284,11 +235,10 @@ class DoctorDetail extends Component {
                 switch(each) {
                     case 'name': {
                         if (isDirty.name) {
-                            if (userData.name.length < 3) {
-                                errors[each] = "*Must be Greater than 3 characters";
-                            }
-                            if (!userData.name.length) {
+                            if (!userData.name.trim().length) {
                                 errors[each] = "*Required";
+                            } else if (userData.name.trim().length < 3) {
+                                errors[each] = "*Should be minimum of 3 characters";
                             } else {
                                 delete errors[each];
                                 isDirty.name = false;
@@ -355,6 +305,17 @@ class DoctorDetail extends Component {
                         }
                         break;
                     }
+                    case 'languages': {
+                        if (isDirty.languages) {
+                            if (!userData.languages.length) {
+                                errors[each] = "*At Least one language is required";
+                            } else {
+                                delete errors[each];
+                                isDirty.languages = false;
+                            }
+                        }
+                        break;
+                    }
                     case 'phone': {
                         if (isDirty.phone) {
                             if ((userData.phone).toString().length < 10 || (userData.phone).toString().length > 10) {
@@ -371,17 +332,16 @@ class DoctorDetail extends Component {
                     }
                     case 'email': {
                         if (isDirty.email) {
-                            if (
+                            if (!userData.email.trim().length) {
+                                errors.email = "*Required";
+                            } else if (
                                 userData.email.trim().length &&
                                 !new RegExp(
                                     "^[a-zA-Z0-9]{1}[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,3}$"
                                 ).test(userData.email)
                                 ) {
-                                    errors.email = "* Invalid Email";
-                                }
-                            if (!userData.email.trim().length) {
-                                errors.email = "* Please fill above field";
-                            }  else {
+                                    errors.email = "*Invalid Email";
+                                } else {
                                     delete errors[each];
                                     isDirty.email = false;
                             }
@@ -421,24 +381,24 @@ class DoctorDetail extends Component {
                         }
                         break;
                     }
-                    case 'specialization': {
-                        if (isDirty.specialization) {
-                            if (!userData.specialization.trim().length) {
+                    case 'specialize': {
+                        if (isDirty.specialize) {
+                            if (!userData.specialize.trim().length) {
                                 errors[each] = "* Please fill above field";
                             } else {
                                 delete errors[each];
-                                isDirty.specialization = false;
+                                isDirty.specialize = false;
                             }
                         }
                         break;
                     }
-                    case 'superSpecialization': {
-                        if (isDirty.superSpeciallization) {
-                            if (!userData.superSpecialization.trim().length) {
+                    case 'superSpecialize': {
+                        if (isDirty.superSpecialize) {
+                            if (!userData.superSpecialize.trim().length) {
                                 errors[each] = "* Please fill above field";
                             } else {
                                 delete errors[each];
-                                isDirty.superSpecialization = false;
+                                isDirty.superSpecialize = false;
                             }
                         }
                         break;
@@ -452,11 +412,31 @@ class DoctorDetail extends Component {
             this.setState({ errors });
             return Object.keys(errors).length ? errors : null;
         }
-    
+        
 
     render() 
-        {
-            const { userData, specialities, errors } = this.state;
+    {
+            const { userData, specialities, errors, lang} = this.state;
+           const langCheckbox =
+                lang.map( lang => {
+                return <div check key={lang}
+                        className='form-check-inline'>
+                            <label check>
+                                <input 
+                                type="checkbox" 
+                                value={lang}
+                                onChange={(e) => 
+                                    this._handleOnChange("languages",e.target)
+                                }
+                                checked={userData.lang.includes(lang)?true:false}
+                                />{' '}
+                                {lang}
+                            </label>
+                        </div>
+                })
+
+            
+            
         return (
             <Fragment>
                 <section className='d-flex justify-content-center'>
@@ -473,7 +453,7 @@ class DoctorDetail extends Component {
                                     // onBlur={this._handleOnBlur}
                                     // onFocus={this._handleOnFocus}
                                     value={userData.name}
-                                    placeholder="Enter Name ..."
+                                    placeholder="Enter Your Name ..."
                                     onChange={(e) => 
                                         this._handleOnChange("name",e.target.value)
                                     }
@@ -510,7 +490,7 @@ class DoctorDetail extends Component {
                         </div>
                         <div className='formDiv'>
                             <div className='form-group'>
-                                <label htmlFor=''>Experience</label>
+                                <label htmlFor='experience'>Experience</label>
                                 <input type='number' id="experienceInput" name="experience" value={userData.experience} min={0}
                                     onChange={(e) => 
                                         this._handleOnChange("experience",parseInt(e.target.value))
@@ -527,7 +507,7 @@ class DoctorDetail extends Component {
                             </div>
                             
                             <div className='form-group'>
-                                <label htmlFor=''>Consult Fees</label>
+                                <label htmlFor='COnsultant_fee'>Consult Fees</label>
                                 <input type='number' id="consultFeesInput" name='consultFees' value={userData.consultFees} min={0}
                                     onChange={(e) => 
                                         this._handleOnChange("consultFees",parseInt(e.target.value))
@@ -545,7 +525,7 @@ class DoctorDetail extends Component {
                         </div>
                         <div className='formDiv'>
                             <div className='form-group'>
-                                <label htmlFor=''>Qualification</label>
+                                <label htmlFor='qualification'>Qualification</label>
                                 <input type='text' id="qualificationInput" name="qualification" value={userData.qualification}
                                     onChange={(e) => 
                                         this._handleOnChange("qualification",e.target.value.trim())
@@ -577,72 +557,12 @@ class DoctorDetail extends Component {
                                 )}
                             </div>
                         </div>
-                        <div className='formDiv'>
+                        <div className='formDiv' id="langDiv">
                             <div>
                                 <label htmlFor=''>Languages</label>
                             </div>
                             <div>
-                                <div className='form-check-inline'>
-                                    <label className='form-check-label' >
-                                        <input
-                                            id='LH' 
-                                            type='checkbox'
-                                            className='form-check-input'
-                                            // checked={ this._checklang("Hindi") }
-                                        />
-                                        Hindi
-                                    </label>
-                                </div>
-                                <div className='form-check-inline'>
-                                    <label className='form-check-label'>
-                                        <input
-                                            type='checkbox'
-                                            className='form-check-input'
-                                            // checked={ this._checklang("English") }
-                                        />
-                                        English
-                                    </label>
-                                </div>
-                                <div className='form-check-inline'>
-                                    <label className='form-check-label'>
-                                        <input
-                                            type='checkbox'
-                                            className='form-check-input'
-                                            // checked={ this._checklang("Bengali") }
-                                        />
-                                        Bengali
-                                    </label>
-                                </div>
-                                <div className='form-check-inline'>
-                                    <label className='form-check-label'>
-                                        <input
-                                            type='checkbox'
-                                            className='form-check-input'
-                                            // checked={ this._checklang("Telugu") }
-                                        />
-                                        Telugu
-                                    </label>
-                                </div>
-                                <div className='form-check-inline'>
-                                    <label className='form-check-label'>
-                                        <input
-                                            type='checkbox'
-                                            className='form-check-input'
-                                            // checked={ this._checklang("Gujrati") }
-                                        />
-                                        Gujrati
-                                    </label>
-                                </div>
-                                <div className='form-check-inline'>
-                                    <label className='form-check-label'>
-                                        <input
-                                            type='checkbox'
-                                            className='form-check-input'
-                                            // checked={ this._checklang("Tamil") }
-                                        />
-                                        Tamil
-                                    </label>
-                                </div>
+                            {langCheckbox}
                             </div>
                             {errors && (
                                     <Fragment>
@@ -655,7 +575,7 @@ class DoctorDetail extends Component {
                         </div>
                         <div className='formDiv'>
                             <div className='form-group'>
-                                <label htmlFor=''>Email</label>
+                                <label htmlFor='EmailId'>Email</label>
                                 <input type='email' name="email" value={userData.email}
                                     onChange={(e) => 
                                     this._handleOnChange("email",e.target.value.trim())
@@ -691,7 +611,7 @@ class DoctorDetail extends Component {
                                 <div className='form-check-inline'>
                                     <label className='form-check-label'>
                                         <input
-                                            type='checkbox'
+                                            type='radio'
                                             className='form-check-input'
                                             name="gender"
                                             value="Male"
@@ -707,7 +627,7 @@ class DoctorDetail extends Component {
                                 <div className='form-check-inline'>
                                     <label className='form-check-label'>
                                         <input
-                                            type='checkbox'
+                                            type='radio'
                                             className='form-check-input'
                                             name="gender"
                                             value="Female"
@@ -742,12 +662,13 @@ class DoctorDetail extends Component {
                             <div className='form-group'>
                                 <label htmlFor='comment'>Graduation</label>
                                 <textarea
+                                    type="textarea"
                                     name="text"
                                     className='form-control'
-                                    rows='5'
-                                    id='comment' value={userData.qualification} onChange={(e) => 
+                                    rows='4'
+                                    id='comment' value={userData.graduation} onChange={(e) => 
                                         this._handleOnChange("graduation",e.target.value.trim())
-                                    }></textarea>
+                                    }/>
                                     {errors && (
                                     <Fragment>
                                         <small style={{ color: "red" }}>
@@ -762,10 +683,10 @@ class DoctorDetail extends Component {
                                 <textarea
                                     name="text"
                                     className='form-control'
-                                    rows='5'
+                                    rows='4'
                                     id='comment' value={userData.specialize}
                                     onChange={(e) => 
-                                        this._handleOnChange("specialization",e.target.value.trim())
+                                        this._handleOnChange("specialize",e.target.value.trim())
                                     }></textarea>
                                     {errors && (
                                     <Fragment>
@@ -785,8 +706,8 @@ class DoctorDetail extends Component {
                                 <textarea
                                     name="text"
                                     className='form-control'
-                                    rows='5'
-                                    id='comment' value={this.state.userData.superSpecilize}
+                                    rows=''
+                                    id='comment' value={this.state.userData.superSpecialize}
                                     onChange={(e) => 
                                         this._handleOnChange("superSpecialize",e.target.value.trim())
                                     }></textarea>
@@ -801,7 +722,7 @@ class DoctorDetail extends Component {
                             </div>
                         </div>
                         <hr />
-                        <button>Save</button>
+                        <button type="submit" className="btn btn-primary">Save</button>
                     </form>
                 </section>
             </Fragment>

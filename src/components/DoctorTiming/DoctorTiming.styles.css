@@ -2,3 +2,6 @@
     width:80%;
     border: 2px solid gray;
    }
+.formGroupDiv{
+    flex: 3;
+}

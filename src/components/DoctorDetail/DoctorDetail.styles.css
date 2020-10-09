@@ -6,9 +6,16 @@
     display: flex;
     width: 90%;
     margin: 0 auto;
+    padding: 10px 0px;
 }
 .formDiv>div{
     flex: 1;
     display: flex;
     flex-direction: column;
+}
+#langDiv{
+    flex-direction: column;
+}
+#langDiv div:nth-child(2){
+    display: inline;
 }
